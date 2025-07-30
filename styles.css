@@ -14,7 +14,7 @@ body {
 #library {
   display: flex;
   flex-direction: column;
-  max-width: 68.15ch;
+  width: min(90%, 68.15ch);
 }
 
 #header {
@@ -24,7 +24,7 @@ body {
   height: 50px;
 }
 
-#header button {
+.bookAddBtn {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -38,12 +38,12 @@ body {
   transition: border 0.6s ease;
 }
 
-#header button:hover {
+.bookAddBtn:hover {
   border-color: gray;
   transform: scale(1.13);
 }
 
-#header button img {
+.bookAddBtn img {
   height: 30px;
 }
 
@@ -51,6 +51,7 @@ body {
   display: flex;
   gap: 20px;
   flex-wrap: wrap;
+  padding: 0px 20px;
 }
 
 .book {
@@ -119,4 +120,10 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
+}
+
+.bookInfoFormSubmitBtn {
+  margin-top: 10px;
+  width: 70px;
+  align-self: center;
 }
