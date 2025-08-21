@@ -54,7 +54,7 @@ body {
   padding: 0px 20px;
 }
 
-.book {
+.book-card {
   background-color: lightcoral;
   height: calc(8.5rem * 1.5);
   min-width: calc(5.5rem * 1.5);
@@ -66,7 +66,7 @@ body {
   align-items: flex-end;
 }
 
-.book:hover {
+.book-card:hover {
   scale: 1.03;
   border-color: rgb(41, 41, 41);
 }
