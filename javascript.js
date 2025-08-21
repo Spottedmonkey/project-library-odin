@@ -1,190 +1,192 @@
 const bookShelf = document.querySelector("#bookShelf");
 const bookAddBtn = document.querySelector(".bookAddBtn");
 
+//Add book modal selectors
+const addBookModal = document.querySelector("#addBookModal");
+const addBookForm = document.querySelector("#addBookForm");
+const cancelAddBookBtn = document.querySelector("#cancelAddBook");
+
+//Edit book modal selectors
+const editBookModal = document.querySelector("#editBookModal");
+const editBookForm = document.querySelector("#editBookForm");
+const cancelEditBookBtn = document.querySelector("#cancelEditBook");
+
+//Selectors for inputs inside edit form
+const editBookIdInput = document.querySelector("#editBookId");
+const editBookTitleInput = document.querySelector("#editBookTitle");
+const editBookAuthorInput = document.querySelector("#editBookAuthor");
+const editBookPageCountInput = document.querySelector("#editBookPageCount");
+const editBookReadInput = document.querySelector("#editBookRead");
+const editBookUnreadInput = document.querySelector("#editBookUnread");
+
 const myLibrary = [];
 
-function Book(title, author, numberOfPages, readStatus) {
-  this.title = title;
-  this.author = author;
-  this.numberOfPages = numberOfPages;
-  this.readStatus = readStatus;
+class Book {
+  constructor(title, author, numberOfPages, readStatus, id) {
+    this.title = title;
+    this.author = author;
+    this.numberOfPages = numberOfPages;
+    this.readStatus = readStatus;
+    this.id = id || crypto.randomUUID();
+  }
+
+  toggleReadStatus() {
+    this.readStatus = this.readStatus === "Read" ? "Unread" : "Read";
+  }
 }
 
-function addBookToLibrary() {
-  let bookInfo = new Book();
-  myLibrary.push(bookInfo);
-  generateNewBook();
-
-  return console.log(bookInfo);
+function addBookToLibrary(title, author, numberOfPages, readStatus) {
+  const newBook = new Book(title, author, numberOfPages, readStatus);
+  myLibrary.push(newBook);
+  return newBook;
 }
 
-function generateNewBook() {
-  const createDiv = document.createElement("div");
-  const createBtn = document.createElement("button");
-  const addImg = document.createElement("img");
-  const createDialog = document.createElement("dialog");
+function displayBook(book) {
+  const bookDiv = document.createElement("div");
+  bookDiv.classList.add("book-card");
+  bookDiv.dataset.bookId = book.id;
 
-  bookShelf.appendChild(createDiv);
-  createDiv.appendChild(createBtn);
-  createDiv.appendChild(createDialog);
-  createBtn.appendChild(addImg);
+  const titleEl = document.createElement("h3");
+  titleEl.textContent = book.title;
 
-  createDiv.classList = "book";
-  createBtn.classList = "bookInfoBtn";
-  addImg.classList = "bookInfoImg";
-  createDialog.classList = "bookInfoDialog";
+  const authorEl = document.createElement("p");
+  authorEl.textContent = `Author: ${book.author}`;
 
-  addImg.src = `./images/info-icon.svg`;
-  createDialog.setAttribute("closedBy", "any");
+  const pagesEl = document.createElement("p");
+  pagesEl.textContent = `Pages: ${book.numberOfPages}`;
 
-  createDiv.id = crypto.randomUUID();
+  const readStatusEl = document.createElement("p");
+  readStatusEl.textContent = `Status: ${book.readStatus}`;
+  readStatusEl.classList.add("read-status");
 
-  createBtn.addEventListener("click", () => {
-    createDialog.showModal();
+  const actionsDiv = document.createElement("div");
+  actionsDiv.classList.add("book-actions");
+
+  const toggleReadBtn = document.createElement("button");
+  toggleReadBtn.textContent = `Mark as ${
+    book.readStatus === "Read" ? "Unread" : "Read"
+  }`;
+  toggleReadBtn.classList.add("toggle-read-btn");
+
+  const editBtn = document.createElement("button");
+  editBtn.textContent = "Edit";
+  editBtn.classList.add("edit-book-btn");
+
+  const deleteBtn = document.createElement("button");
+  deleteBtn.textContent = "Delete";
+  deleteBtn.classList.add("delete-book-btn");
+
+  actionsDiv.append(toggleReadBtn, editBtn, deleteBtn);
+  bookDiv.append(titleEl, authorEl, pagesEl, readStatusEl, actionsDiv);
+  bookShelf.appendChild(bookDiv);
+
+  toggleReadBtn.addEventListener("click", () => {
+    book.toggleReadStatus();
+    readStatusEl.textContent = `Status: ${book.readStatus}`;
+    toggleReadBtn.textContent = `Mark as ${
+      book.readStatus === "Read" ? "Unread" : "Read"
+    }`;
+    console.log(`Toggled '${book.title}' read status to: ${book.readStatus}`);
+    console.log("Current Library:", myLibrary);
   });
 
-  //form
-  const createForm = document.createElement("form");
-  createDialog.appendChild(createForm);
-  // #region form book title
-  const createTitleInput = document.createElement("input");
-  const createTitleLabel = document.createElement("label");
-
-  createForm.appendChild(createTitleLabel);
-  createForm.appendChild(createTitleInput);
-
-  createForm.classList = "bookInfoForm";
-  createForm.setAttribute("method", "dialog");
-
-  createTitleInput.type = "text";
-  createTitleInput.name = "bookTitle";
-  createTitleInput.id = "bookTitle";
-  createTitleInput.classList = "titleInput";
-
-  createTitleLabel.textContent = "Title:";
-  createTitleLabel.setAttribute("for", "bookTitle");
-  // #endregion
-
-  // #region form book author
-  const createAuthorInput = document.createElement("input");
-  const createAuthorLabel = document.createElement("label");
-
-  createForm.appendChild(createAuthorLabel);
-  createForm.appendChild(createAuthorInput);
-
-  createAuthorLabel.textContent = "Author:";
-  createAuthorLabel.setAttribute("for", "bookAuthor");
-
-  createAuthorInput.type = "text";
-  createAuthorInput.name = "bookAuthor";
-  createAuthorInput.id = "bookAuthor";
-  createAuthorInput.classList = "authorInput";
-  // #endregion
-
-  // #region form page count
-  const createPageCountInput = document.createElement("input");
-  const createPageCountLabel = document.createElement("label");
-
-  createForm.appendChild(createPageCountLabel);
-  createForm.appendChild(createPageCountInput);
-
-  createPageCountLabel.textContent = "Page Count:";
-  createPageCountLabel.setAttribute("for", "bookPageCount");
-
-  createPageCountInput.type = "number";
-  createPageCountInput.name = "bookPageCount";
-  createPageCountInput.id = "bookPageCount";
-  createPageCountInput.min = "0";
-  createPageCountInput.classList = "pageCountInput";
-  // #endregion
-
-  // #region form read status
-  const createReadStatusInput = document.createElement("input");
-  const createReadStatusLabel = document.createElement("label");
-  const createReadStatusDiv = document.createElement("div");
-
-  createForm.appendChild(createReadStatusDiv);
-  createReadStatusDiv.classList = "readStatusDiv";
-
-  createReadStatusDiv.appendChild(createReadStatusLabel);
-  createReadStatusDiv.appendChild(createReadStatusInput);
-
-  createReadStatusLabel.textContent = "Read";
-  createReadStatusLabel.setAttribute("for", "bookReadStatus");
-
-  createReadStatusInput.type = "radio";
-  createReadStatusInput.name = "bookReadStatus";
-  createReadStatusInput.id = "bookReadStatus";
-  createReadStatusInput.value = "read";
-  createReadStatusInput.classList = "readStatusInput";
-
-  const createUnreadStatusInput = document.createElement("input");
-  const createUnreadStatusLabel = document.createElement("label");
-
-  createReadStatusDiv.appendChild(createUnreadStatusLabel);
-  createReadStatusDiv.appendChild(createUnreadStatusInput);
-
-  createUnreadStatusLabel.textContent = "Unread";
-  createUnreadStatusLabel.setAttribute("for", "bookUnreadStatus");
-
-  createUnreadStatusInput.type = "radio";
-  createUnreadStatusInput.name = "bookReadStatus";
-  createUnreadStatusInput.id = "bookUnreadStatus";
-  createUnreadStatusInput.value = "unread";
-  createUnreadStatusInput.classList = "unreadStatusInput";
-  // #endregion
-
-  // #region form book cover
-
-  // const createAuthorInput = document.createElement("input");
-  // const createAuthorLabel = document.createElement("label");
-
-  // createForm.appendChild(createAuthorLabel);
-  // createForm.appendChild(createAuthorInput);
-
-  // createAuthorLabel.textContent = "Author:";
-  // createAuthorLabel.setAttribute("for", "bookAuthor");
-
-  // createAuthorInput.type = "text";
-  // createAuthorInput.name = "bookAuthor";
-  // createAuthorInput.id = "bookAuthor";
-  // createAuthorInput.classList = "authorInput";
-  // #endregion
-
-  // #region form buttons
-  const createSubmitBtn = document.createElement("button");
-
-  createForm.appendChild(createSubmitBtn);
-
-  createSubmitBtn.classList = "bookInfoFormSubmitBtn";
-  createSubmitBtn.textContent = "Submit";
-
-  const selectSubmitBtn = document.querySelectorAll(".bookInfoFormSubmitBtn");
-
-  selectSubmitBtn.forEach((button) => {
-    button.addEventListener("click", function (event) {
-      event.preventDefault();
-      const formData = new FormData(createForm);
-      const getBookTitle = formData.get("bookTitle");
-      const getBookAuthor = formData.get("bookAuthor");
-      const getBookPageCount = formData.get("bookPageCount");
-      const getBookReadStatus = formData.get("bookReadStatus");
-      console.log(getBookTitle);
-      console.log(getBookAuthor);
-      console.log(getBookPageCount);
-      console.log(getBookReadStatus);
-      createDialog.close();
-    });
+  deleteBtn.addEventListener("click", () => {
+    const bookIndex = myLibrary.findIndex((b) => b.id === book.id);
+    if (bookIndex > -1) {
+      myLibrary.splice(bookIndex, 1);
+    }
+    bookDiv.remove();
+    console.log(`Deleted book: '${book.title}'`);
+    console.log("Current Library:", myLibrary);
   });
 
-  // #endregion
+  editBtn.addEventListener("click", () => {
+    alert(`Prepare to edit: ${book.title}`);
+    editBookIdInput.value = book.id;
+    editBookTitleInput.value = book.title;
+    editBookAuthorInput.value = book.author;
+    editBookPageCountInput.value = book.numberOfPages;
+
+    if (book.readStatus === "Read") {
+      editBookReadInput.checked = true;
+    } else {
+      editBookUnreadInput.checked = true;
+    }
+
+    editBookModal.showModal();
+  });
 }
 
-bookAddBtn.addEventListener("click", () => {
-  addBookToLibrary();
-  console.log(myLibrary);
+editBookForm.addEventListener("submit", (event) => {
+  const formData = new FormData(editBookForm);
+  const bookId = formData.get("id");
+  const updatedTitle = formData.get("title");
+  const updatedAuthor = formData.get("author");
+  const updatedNumberOfPages = formData.get("numberOfPages");
+  const updatedReadStatus = formData.get("readStatus");
+
+  const bookToUpdate = myLibrary.find((book) => book.id === bookId);
+
+  if (bookToUpdate) {
+    bookToUpdate.title = updatedTitle;
+    bookToUpdate.author = updatedAuthor;
+    bookToUpdate.numberOfPages = updatedNumberOfPages;
+    bookToUpdate.readStatus = updatedReadStatus;
+
+    const bookCardToUpdate = document.querySelector(
+      `[data-book-id="${bookId}"]`
+    );
+
+    if (bookCardToUpdate) {
+      bookCardToUpdate.querySelector("h3").textContent = updatedTitle;
+      bookCardToUpdate.querySelector(
+        "p:nth-of-type(1)"
+      ).textContent = `Author: ${updatedAuthor}`;
+      bookCardToUpdate.querySelector(
+        "p:nth-of-type(2)"
+      ).textContent = `Pages: ${updatedNumberOfPages}`;
+      bookCardToUpdate.querySelector(
+        ".read-status"
+      ).textContent = `Status: ${updatedReadStatus}`;
+
+      const toggleBtn = bookCardToUpdate.querySelector(".toggle-read-btn");
+      if (toggleBtn) {
+        toggleBtn.textContent = `Mark as ${
+          bookToUpdate.readStatus === "Read" ? "Unread" : "Read"
+        }`;
+      }
+    }
+    console.log(`Book '${bookToUpdate.title}' updated!`);
+    console.log("Current Library:", myLibrary);
+  } else {
+    console.warn(`Book with ID ${bookId} not found for update`);
+  }
 });
 
-console.log(myLibrary.length);
-console.log(myLibrary);
-console.log(myLibrary.length);
+cancelEditBookBtn.addEventListener("click", () => {
+  editBookModal.close();
+});
+
+bookAddBtn.addEventListener("click", () => {
+  addBookForm.reset();
+  addBookModal.showModal();
+});
+
+addBookForm.addEventListener("submit", (event) => {
+  const formData = new FormData(addBookForm);
+  const title = formData.get("title");
+  const author = formData.get("author");
+  const numberOfPages = formData.get("numberOfPages");
+  const readStatus = formData.get("readStatus");
+
+  const newBook = addBookToLibrary(title, author, numberOfPages, readStatus);
+  displayBook(newBook);
+
+  console.log("Book Added! Current Library:", myLibrary);
+});
+
+cancelAddBookBtn.addEventListener("click", () => {
+  addBookModal.close();
+});
+
+console.log("myLibrary initialized:", myLibrary);
