@@ -1,192 +1,87 @@
-const bookShelf = document.querySelector("#bookShelf");
-const bookAddBtn = document.querySelector(".bookAddBtn");
+const openBookDialog = document.querySelector("#openBookDialog");
+const newBookDialog = document.querySelector("#newBookDialog");
+const body = document.querySelector(".body");
+const newBookForm = document.querySelector("#newBookForm");
 
-//Add book modal selectors
-const addBookModal = document.querySelector("#addBookModal");
-const addBookForm = document.querySelector("#addBookForm");
-const cancelAddBookBtn = document.querySelector("#cancelAddBook");
+//New book form elements
+const formSubmit = document.querySelector("#formSubmit");
+const bookID = document.querySelector("#bookID");
 
-//Edit book modal selectors
-const editBookModal = document.querySelector("#editBookModal");
-const editBookForm = document.querySelector("#editBookForm");
-const cancelEditBookBtn = document.querySelector("#cancelEditBook");
+let myLibrary = [];
 
-//Selectors for inputs inside edit form
-const editBookIdInput = document.querySelector("#editBookId");
-const editBookTitleInput = document.querySelector("#editBookTitle");
-const editBookAuthorInput = document.querySelector("#editBookAuthor");
-const editBookPageCountInput = document.querySelector("#editBookPageCount");
-const editBookReadInput = document.querySelector("#editBookRead");
-const editBookUnreadInput = document.querySelector("#editBookUnread");
-
-const myLibrary = [];
-
-class Book {
-  constructor(title, author, numberOfPages, readStatus, id) {
-    this.title = title;
-    this.author = author;
-    this.numberOfPages = numberOfPages;
-    this.readStatus = readStatus;
-    this.id = id || crypto.randomUUID();
-  }
-
-  toggleReadStatus() {
-    this.readStatus = this.readStatus === "Read" ? "Unread" : "Read";
-  }
+function Book(title, author, pageCount, readStatus, id) {
+  this.title = title;
+  this.author = author;
+  this.pageCount = pageCount;
+  this.readStatus = readStatus;
+  this.id = id;
 }
 
-function addBookToLibrary(title, author, numberOfPages, readStatus) {
-  const newBook = new Book(title, author, numberOfPages, readStatus);
+function addBookToLibrary(title, author, pageCount, readStatus, id) {
+  let newBook = new Book(title, author, pageCount, readStatus, id);
   myLibrary.push(newBook);
   return newBook;
 }
 
-function displayBook(book) {
-  const bookDiv = document.createElement("div");
-  bookDiv.classList.add("book-card");
-  bookDiv.dataset.bookId = book.id;
+openBookDialog.addEventListener("click", () => {
+  newBookDialog.showModal();
+});
 
-  const titleEl = document.createElement("h3");
-  titleEl.textContent = book.title;
+formSubmit.addEventListener("click", (e) => {
+  if (!newBookForm.reportValidity()) {
+    e.preventDefault();
+    return;
+  } else {
+    bookID.value = crypto.randomUUID();
 
-  const authorEl = document.createElement("p");
-  authorEl.textContent = `Author: ${book.author}`;
+    const createNewBook = document.createElement("div");
+    const displayTitle = document.createElement("p");
+    const displayAuthor = document.createElement("p");
+    const displayReadStatus = document.createElement("p");
+    const displayPageCount = document.createElement("p");
 
-  const pagesEl = document.createElement("p");
-  pagesEl.textContent = `Pages: ${book.numberOfPages}`;
+    //obtaining book values
+    const getBookTitle = document.querySelector("#bookTitle").value;
+    const getBookAuthor = document.querySelector("#bookAuthor").value;
+    const getBookPageCount = document.querySelector("#bookPageCount").value;
+    const getBookReadStatus = document.getElementsByName("bookReadStatus");
+    const getBookID = document.querySelector("#bookID").value;
 
-  const readStatusEl = document.createElement("p");
-  readStatusEl.textContent = `Status: ${book.readStatus}`;
-  readStatusEl.classList.add("read-status");
+    const displayBookReadStatus = () => {
+      for (const status of getBookReadStatus) {
+        if (status.checked) {
+          return status.value;
+        }
+      }
+      return "";
+    };
 
-  const actionsDiv = document.createElement("div");
-  actionsDiv.classList.add("book-actions");
-
-  const toggleReadBtn = document.createElement("button");
-  toggleReadBtn.textContent = `Mark as ${
-    book.readStatus === "Read" ? "Unread" : "Read"
-  }`;
-  toggleReadBtn.classList.add("toggle-read-btn");
-
-  const editBtn = document.createElement("button");
-  editBtn.textContent = "Edit";
-  editBtn.classList.add("edit-book-btn");
-
-  const deleteBtn = document.createElement("button");
-  deleteBtn.textContent = "Delete";
-  deleteBtn.classList.add("delete-book-btn");
-
-  actionsDiv.append(toggleReadBtn, editBtn, deleteBtn);
-  bookDiv.append(titleEl, authorEl, pagesEl, readStatusEl, actionsDiv);
-  bookShelf.appendChild(bookDiv);
-
-  toggleReadBtn.addEventListener("click", () => {
-    book.toggleReadStatus();
-    readStatusEl.textContent = `Status: ${book.readStatus}`;
-    toggleReadBtn.textContent = `Mark as ${
-      book.readStatus === "Read" ? "Unread" : "Read"
-    }`;
-    console.log(`Toggled '${book.title}' read status to: ${book.readStatus}`);
-    console.log("Current Library:", myLibrary);
-  });
-
-  deleteBtn.addEventListener("click", () => {
-    const bookIndex = myLibrary.findIndex((b) => b.id === book.id);
-    if (bookIndex > -1) {
-      myLibrary.splice(bookIndex, 1);
-    }
-    bookDiv.remove();
-    console.log(`Deleted book: '${book.title}'`);
-    console.log("Current Library:", myLibrary);
-  });
-
-  editBtn.addEventListener("click", () => {
-    alert(`Prepare to edit: ${book.title}`);
-    editBookIdInput.value = book.id;
-    editBookTitleInput.value = book.title;
-    editBookAuthorInput.value = book.author;
-    editBookPageCountInput.value = book.numberOfPages;
-
-    if (book.readStatus === "Read") {
-      editBookReadInput.checked = true;
-    } else {
-      editBookUnreadInput.checked = true;
-    }
-
-    editBookModal.showModal();
-  });
-}
-
-editBookForm.addEventListener("submit", (event) => {
-  const formData = new FormData(editBookForm);
-  const bookId = formData.get("id");
-  const updatedTitle = formData.get("title");
-  const updatedAuthor = formData.get("author");
-  const updatedNumberOfPages = formData.get("numberOfPages");
-  const updatedReadStatus = formData.get("readStatus");
-
-  const bookToUpdate = myLibrary.find((book) => book.id === bookId);
-
-  if (bookToUpdate) {
-    bookToUpdate.title = updatedTitle;
-    bookToUpdate.author = updatedAuthor;
-    bookToUpdate.numberOfPages = updatedNumberOfPages;
-    bookToUpdate.readStatus = updatedReadStatus;
-
-    const bookCardToUpdate = document.querySelector(
-      `[data-book-id="${bookId}"]`
+    addBookToLibrary(
+      getBookTitle,
+      getBookAuthor,
+      getBookPageCount,
+      displayBookReadStatus(),
+      getBookID
     );
 
-    if (bookCardToUpdate) {
-      bookCardToUpdate.querySelector("h3").textContent = updatedTitle;
-      bookCardToUpdate.querySelector(
-        "p:nth-of-type(1)"
-      ).textContent = `Author: ${updatedAuthor}`;
-      bookCardToUpdate.querySelector(
-        "p:nth-of-type(2)"
-      ).textContent = `Pages: ${updatedNumberOfPages}`;
-      bookCardToUpdate.querySelector(
-        ".read-status"
-      ).textContent = `Status: ${updatedReadStatus}`;
+    body.appendChild(createNewBook);
+    createNewBook.classList.add("book-tile");
+    createNewBook.id = getBookID;
 
-      const toggleBtn = bookCardToUpdate.querySelector(".toggle-read-btn");
-      if (toggleBtn) {
-        toggleBtn.textContent = `Mark as ${
-          bookToUpdate.readStatus === "Read" ? "Unread" : "Read"
-        }`;
-      }
-    }
-    console.log(`Book '${bookToUpdate.title}' updated!`);
-    console.log("Current Library:", myLibrary);
-  } else {
-    console.warn(`Book with ID ${bookId} not found for update`);
+    createNewBook.appendChild(displayTitle);
+    displayTitle.textContent = `Title: ${getBookTitle}`;
+
+    createNewBook.appendChild(displayAuthor);
+    displayAuthor.textContent = `Author: ${getBookAuthor}`;
+
+    createNewBook.appendChild(displayPageCount);
+    displayPageCount.textContent = `Page count: ${getBookPageCount}`;
+
+    createNewBook.appendChild(displayReadStatus);
+    displayReadStatus.textContent = `Read status: ${displayBookReadStatus()}`;
+
+    console.log(myLibrary);
   }
 });
 
-cancelEditBookBtn.addEventListener("click", () => {
-  editBookModal.close();
-});
-
-bookAddBtn.addEventListener("click", () => {
-  addBookForm.reset();
-  addBookModal.showModal();
-});
-
-addBookForm.addEventListener("submit", (event) => {
-  const formData = new FormData(addBookForm);
-  const title = formData.get("title");
-  const author = formData.get("author");
-  const numberOfPages = formData.get("numberOfPages");
-  const readStatus = formData.get("readStatus");
-
-  const newBook = addBookToLibrary(title, author, numberOfPages, readStatus);
-  displayBook(newBook);
-
-  console.log("Book Added! Current Library:", myLibrary);
-});
-
-cancelAddBookBtn.addEventListener("click", () => {
-  addBookModal.close();
-});
-
-console.log("myLibrary initialized:", myLibrary);
+console.log(addBookToLibrary("pizza", "llama", "45", "read"));
