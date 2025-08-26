@@ -6,104 +6,44 @@
     <title>Document</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
-  <body>
-    <dialog id="addBookModal">
-      <form id="addBookForm" method="dialog">
-        <h2>Add New Book</h2>
+  <body class="body">
+    <button id="openBookDialog">new Book</button>
+    <dialog id="newBookDialog" closedby="any">
+      <form method="dialog" id="newBookForm">
+        <label for="bookTitle">Title:</label>
+        <input type="text" name="bookTitle" id="bookTitle" required />
 
-        <label for="newBookTitle">Title:</label>
-        <input type="text" id="newBookTitle" name="title" required />
+        <label for="bookAuthor">Author:</label>
+        <input type="text" name="bookAuthor" id="bookAuthor" required />
 
-        <label for="newBookAuthor">Author:</label>
-        <input type="text" id="newBookAuthor" name="author" required />
-
-        <label for="newBookPageCount">Page Count:</label>
+        <label for="bookPageCount">Page count:</label>
         <input
           type="number"
-          id="newBookPageCount"
-          name="numberOfPages"
-          min="0"
+          name="bookPageCount"
+          id="bookPageCount"
+          min="1"
           required
         />
 
-        <fieldset>
-          <legend>Read Status:</legend>
-          <input
-            type="radio"
-            id="newBookRead"
-            name="readStatus"
-            value="Read"
-            required
-          />
-          <label for="newBookRead">Read</label>
+        <input type="text" name="bookID" id="bookID" hidden />
 
-          <input
-            type="radio"
-            id="newBookUnread"
-            name="readStatus"
-            value="Unread"
-          />
-          <label for="newBookUnread">Unread</label>
-        </fieldset>
+        <label for="bookRead">Read:</label>
+        <input type="radio" name="bookReadStatus" id="bookRead" value="Read" />
 
-        <button type="submit">Add Book</button>
-        <button type="button" id="cancelAddBook">Cancel</button>
-      </form>
-    </dialog>
-
-    <dialog id="editBookModal">
-      <form id="editBookForm" method="dialog">
-        <h2>Edit Book</h2>
-        <input type="hidden" id="editBookId" name="id" />
-
-        <label for="editBookTitle">Title:</label>
-        <input type="text" name="title" id="editBookTitle" required />
-
-        <label for="editBookAuthor"></label>
-        <input type="text" name="author" id="editBookAuthor" required />
-
-        <label for="editBookPageCount">Page Count:</label>
+        <label for="bookUnread">Unread:</label>
         <input
-          type="number"
-          name="numberOfPages"
-          id="editBookPageCount"
-          min="0"
-          required
+          type="radio"
+          name="bookReadStatus"
+          id="bookUnread"
+          value="Unread"
+          checked
         />
 
-        <fieldset>
-          <legend>Read Status:</legend>
-          <input
-            type="radio"
-            name="readStatus"
-            id="editBookRead"
-            value="Read"
-            required
-          />
-          <label for="editBookRead">Read</label>
+        <button class="newBookFormBtn" id="formSubmit">Submit</button>
 
-          <input
-            type="radio"
-            name="readStatus"
-            id="editBookUnread"
-            value="Unread"
-          />
-          <label for="editBookUnread">Unread</label>
-        </fieldset>
-
-        <button type="submit">Save Changes</button>
-        <button type="button" id="cancelEditBook">Cancel</button>
+        <button class="newBookFormBtn" id="formClose">Close</button>
       </form>
     </dialog>
-
-    <div id="library">
-      <div id="header">
-        <button class="bookAddBtn">
-          <img src="./images/add-icon.svg" alt="" />
-        </button>
-      </div>
-      <div id="bookShelf"></div>
-    </div>
     <script src="javascript.js"></script>
   </body>
 </html>
